@@ -51,12 +51,24 @@ G4ThreadLocal G4GlobalMagFieldMessenger* Geometry::fMagFieldMessenger = nullptr;
    G4Material* materi_World = materi_Man->FindOrBuildMaterial( "G4_AIR" );
    auto logVol_World = new G4LogicalVolume{ solid_World, materi_World,
                                             "LogVol_World" };
-   logVol_World->SetVisAttributes ( G4VisAttributes::GetInvisible() );
+   // logVol_World->SetVisAttributes ( G4VisAttributes::GetInvisible() );
 
    // Placement of the logical volume
    G4int copyNum_World = 0;               // Set ID number of world
    auto physVol_World  = new G4PVPlacement{ G4Transform3D(), "PhysVol_World",
                                         logVol_World, 0, false, copyNum_World };
+   G4double absorber_Z = 20*mm;
+   G4double absorber_X = 20*mm;
+   G4double absorber_Y = 15*mm;
+   G4double absorber_pos_X = 0.0*cm;
+   G4double absorber_ang = 0.0*deg;
+   G4double absorber_pos_Y = 0.0*cm;
+   G4double absorber_pos_Z = 0.0*cm;
+   auto solid_absorber = new G4Box{ "Solid_absorber",
+                         absorber_X/2.0, absorber_Y/2.0, absorber_Z/2.0 };
+   G4Material* materi_absorber = materi_Man->FindOrBuildMaterial( "G4_W" );
+   auto logVol_absorber = new G4LogicalVolume{ solid_absorber, materi_absorber,
+                                            "LogVol_absorber" };
 
 // Define 'Pixel Detector' - Global Envelop
    // Define the shape of the global envelop
@@ -70,7 +82,7 @@ G4ThreadLocal G4GlobalMagFieldMessenger* Geometry::fMagFieldMessenger = nullptr;
    G4Material* materi_PixEnvG = materi_Man->FindOrBuildMaterial( "G4_AIR" );
    auto logVol_PixEnvG = new G4LogicalVolume{ solid_PixEnvG, materi_PixEnvG,
                                               "LogVol_PixEnvG" };
-   logVol_PixEnvG->SetVisAttributes ( G4VisAttributes::GetInvisible() );
+   // logVol_PixEnvG->SetVisAttributes ( G4VisAttributes::GetInvisible() );
 
 // Define 'Pixel Detector' - Local Envelop (divided the global envelop in Y-direction)
    // Define the shape of the local envelop
@@ -130,6 +142,20 @@ G4ThreadLocal G4GlobalMagFieldMessenger* Geometry::fMagFieldMessenger = nullptr;
      new G4PVPlacement{ trans3D_LogV_PixEnvG, "PhysVol_PixEnvG", logVol_PixEnvG, physVol_World,
                         false, copyNum_LogV_PixEnvG, true };
    }
+   for (G4int id = 0; id<4; id++){
+      G4double pos_X_LogV_absorber = absorber_pos_X;
+      G4double pos_Y_LogV_absorber = absorber_pos_Y;
+      G4double pos_Z_LogV_absorber = z_pos[id] + leng_Z_PixEnvG/2.0 + absorber_Z/2.0;
+      auto threeVect_LogV_absorber = G4ThreeVector{ pos_X_LogV_absorber,
+                                       pos_Y_LogV_absorber, pos_Z_LogV_absorber };
+      auto rotMtrx_LogV_absorber = G4RotationMatrix{};
+      rotMtrx_LogV_absorber.rotateZ( absorber_ang );
+      auto trans3D_LogV_absorber = G4Transform3D{ rotMtrx_LogV_absorber, threeVect_LogV_absorber };
+
+      G4int copyNum_LogV_absorber = 2000 +id ;                // Set ID number of LogV_absorber
+      new G4PVPlacement{ trans3D_LogV_absorber, "PhysVol_absorber", logVol_absorber, physVol_World,
+                        false, copyNum_LogV_absorber, true };
+   }
 
 // Return the physical world
    return physVol_World;
@@ -139,12 +165,12 @@ void Geometry::ConstructSDandField()
 //------------------------------------------------------------------------------
 {
 // Add uniform magnetic field to the world
-   auto fieldValue = G4ThreeVector{ 1.0*tesla, 0.0, 0.0 };
-   fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-   fMagFieldMessenger->SetVerboseLevel(1);
+   // auto fieldValue = G4ThreeVector{ 1.0*tesla, 0.0, 0.0 };
+   // fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
+   // fMagFieldMessenger->SetVerboseLevel(1);
 
 // Register the field messenger for deleting
-   G4AutoDelete::Register(fMagFieldMessenger);
+   // G4AutoDelete::Register(fMagFieldMessenger);
 
 //Sensitive Volume
 

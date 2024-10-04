@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------------------
 
 ## Particle type
-/gun/particle geantino
+/gun/particle e+
 
 ## Kinematical information
 /gun/energy    1.0 MeV

@@ -50,7 +50,7 @@
    auto uiManager = G4UImanager::GetUIpointer();
  if( argc > 1 ) { // batch mode
    G4String macroFile = argv[1];
-   uiManager->ApplyCommand( "/control/execute batchSetup.mac" ); 
+   uiManager->ApplyCommand( "/control/execute GlobalSetup.mac" ); 
    G4String command = "/control/execute ";
    uiManager->ApplyCommand(command+macroFile);
   } else {   // Start interactive session
